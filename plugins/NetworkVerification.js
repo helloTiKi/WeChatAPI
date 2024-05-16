@@ -1,10 +1,11 @@
 import Api from "../API/index.js";
+import gsData from "../lib/gsData/gsData.js";
+
 //import plugins from "../plugins.js";
 
 const plugins = (await import("../lib/plugins/plugins.js")).default;
 
 export default class NetworkVerification extends plugins {
-    name = "NetworkVerification";
     constructor() {
         super({
             name: "NetworkVerification",
@@ -12,10 +13,7 @@ export default class NetworkVerification extends plugins {
             description: "网络验证插件",
             priority: 1000,
             enable: true,
-            /**接收的数据必须是json且必须有一个event键，插件会读取这个值并调用同名函数 */
-            events: {
-                "getFileMd5": "getFileMd5"
-            }
+            events: ["getFileMd5", "getFileLastModified"]
         });
     }
     /**
@@ -34,36 +32,6 @@ export default class NetworkVerification extends plugins {
         e.retdata = retdata
         console.log("NetworkVerification:post:", e)
         switch (data.event) {
-            case "getFileMd5":
-                let md5 = await Api.getFileMd5({
-                    FileName: data.data.FileName
-                })
-                if (md5) {
-                    retdata.data = { md5: md5 }
-                    retdata.headers = {
-                        "fileMd5": md5
-                    }
-                } else {
-                    retdata.code = -1
-                    retdata.errmsg = "file not found"
-                    retdata.statusCode = 404
-                }
-                break
-            case "getFileLastModified":
-                let lastModified = await Api.getFileLastModified({
-                    FileName: data.data.FileName
-                })
-                if (lastModified) {
-                    retdata.data = { lastModified: lastModified }
-                    retdata.headers = {
-                        "fileLastModified": lastModified
-                    }
-                } else {
-                    retdata.code = -1
-                    retdata.errmsg = "file not found"
-                    retdata.statusCode = 404
-                }
-                break
             case "acquireAdminPrivileges":
                 let isAdmin = await Api.isAdmin({
                     deviceCode: data.data.m,
@@ -125,6 +93,13 @@ export default class NetworkVerification extends plugins {
         }
     }
     async getFileMd5(data) {
+        let retdata = {
+            code: 0,
+            data: {},
+            headers: {},
+            statusCode: 200,
+            errmsg: "ok"
+        }
         let md5 = await Api.getFileMd5({
             FileName: data.data.FileName
         })
@@ -138,6 +113,40 @@ export default class NetworkVerification extends plugins {
             retdata.errmsg = "file not found"
             retdata.statusCode = 404
         }
+        return retdata
     }
-
+    async getFileLastModified(data) {
+        let retdata = {
+            code: 0,
+            data: {},
+            headers: {},
+            statusCode: 200,
+            errmsg: "ok"
+        }
+        let lastModified = await Api.getFileLastModified({
+            FileName: data.data.FileName
+        })
+        if (lastModified) {
+            retdata.data = { lastModified: lastModified }
+            retdata.headers = {
+                "fileLastModified": lastModified
+            }
+        } else {
+            retdata.code = -1
+            retdata.errmsg = "file not found"
+            retdata.statusCode = 404
+        }
+        return retdata
+    }
+    async userLoginByPassword(data) {
+        let retdata = {
+            code: 0,
+            data: {},
+            headers: {},
+            statusCode: 200,
+            errmsg: "ok"
+        }
+        let { username, password } = data.data
+        
+    }
 }
