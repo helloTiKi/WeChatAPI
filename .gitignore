@@ -2,3 +2,6 @@ node_modules/
 data/
 @types/
 plugins/
+global.d.ts
+package.json
+tsconfig.json

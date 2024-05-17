@@ -13,12 +13,12 @@ export default class NetworkVerification extends plugins {
             description: "网络验证插件",
             priority: 1000,
             enable: true,
-            events: ["getFileMd5", "getFileLastModified"]
+            events: ["getFileMd5", "getFileLastModified", "userLoginByPassword"]
         });
     }
     /**
      * 
-     * @param {{data:object,headers:http.IncomingHttpHeaders,cookie:object}} e 
+     * @param {eventData} e 
      */
     async post(e) {
         let { data, headers, cookie } = e
@@ -147,6 +147,6 @@ export default class NetworkVerification extends plugins {
             errmsg: "ok"
         }
         let { username, password } = data.data
-        
+
     }
 }
